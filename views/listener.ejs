@@ -1,0 +1,73 @@
+<h1 class="text-center mb-4">Event Listener</h1>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th scope="col" class="activity-column">Activity</th>
+            <th scope="col" class="data-column">Data</th>
+            <th scope="col" class="response-column">Response</th>
+        </tr>
+    </thead>
+    <tbody id="eventTable">
+        <% events.forEach(event => { %>
+            <tr>
+                <td class="activity-column"><%= event.activity %></td>
+                <td class="data-column">
+                    <pre><%= event.data %></pre>
+                </td>
+                <td class="response-column"><%= event.response %></td>
+            </tr>
+        <% }) %>
+    </tbody>
+</table>
+
+
+<script>
+    const socket = new WebSocket(`ws://${window.location.host}`);
+
+    socket.onopen = () => {
+        console.log('WebSocket connection established');
+    };
+
+    socket.onmessage = (event) => {
+        const newEvents = JSON.parse(event.data);
+
+        // Get the table body
+        const tableBody = document.getElementById('eventTable');
+
+        newEvents.forEach(event => {
+            // Create a new row for the event
+            const row = document.createElement('tr');
+
+            // Activity Column
+            const activityCell = document.createElement('td');
+            activityCell.textContent = event.activity;
+            row.appendChild(activityCell);
+
+            // Data Column
+            const dataCell = document.createElement('td');
+            const pre = document.createElement('pre');
+            pre.textContent = event.data;
+            dataCell.appendChild(pre);
+            row.appendChild(dataCell);
+
+            // Response Column
+            const responseCell = document.createElement('td');
+            responseCell.textContent = event.response; // Add response field
+            row.appendChild(responseCell);
+
+            // Insert the new row at the top of the table
+            tableBody.prepend(row);
+        });
+    };
+
+    socket.onclose = () => {
+        console.log('WebSocket connection closed');
+    };
+
+    socket.onerror = (error) => {
+        console.error('WebSocket error:', error);
+    };
+</script>
+
+
