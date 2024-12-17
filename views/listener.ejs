@@ -23,7 +23,7 @@
 
 
 <script>
-    const socket = new WebSocket(`ws://${window.location.host}`);
+    const socket = new WebSocket(`ws://${window.location.hostname}:3001`);
 
     socket.onopen = () => {
         console.log('WebSocket connection established');
