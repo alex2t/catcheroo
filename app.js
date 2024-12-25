@@ -8,15 +8,14 @@ const expressLayouts = require('express-ejs-layouts'); // Add this for layouts s
 const app = express();
 const server = http.createServer(app);
 
-// Set EJS as the view engine
+
 app.set('view engine', 'ejs');
 
-// Set the views directory (if different from default)
 app.set('views', __dirname + '/views');
 
-// Use Express layouts (optional, if you use layouts)
+
 app.use(expressLayouts);
-app.set('layout', 'layout'); // Specify the default layout
+app.set('layout', 'layout'); 
 
 // Middleware and routes
 app.use(bodyParser.json());
@@ -27,7 +26,7 @@ app.use('/', routes);
 // Set up WebSocket server
 const wss = setupWebSocket(server);
 
-// Broadcast events function
+//  Broadcast events function
 app.locals.broadcastEvent = (event) => {
     wss.broadcast([event]);
 };
