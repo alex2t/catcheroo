@@ -21,6 +21,7 @@
     </tbody>
 </table>
 
+<<<<<<< HEAD
 
 <script>
     const socket = new WebSocket(`wss://${window.location.hostname}:3001`);
@@ -68,6 +69,10 @@
     socket.onerror = (error) => {
         console.error('WebSocket error:', error);
     };
+=======
+<script type="module">
+    import setupWebSocket from '../js/websocket.js';
+    setupWebSocket('eventTable');
+>>>>>>> cebb55dee353ae7d119fa580a6ece9a8e617210a
 </script>
-
 
