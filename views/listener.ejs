@@ -21,53 +21,8 @@
     </tbody>
 </table>
 
-
-<script>
-    const socket = new WebSocket(`ws://${window.location.hostname}:3001`);
-
-    socket.onopen = () => {
-        console.log('WebSocket connection established');
-    };
-
-    socket.onmessage = (event) => {
-        const newEvents = JSON.parse(event.data);
-
-        // Get the table body
-        const tableBody = document.getElementById('eventTable');
-
-        newEvents.forEach(event => {
-            // Create a new row for the event
-            const row = document.createElement('tr');
-
-            // Activity Column
-            const activityCell = document.createElement('td');
-            activityCell.textContent = event.activity;
-            row.appendChild(activityCell);
-
-            // Data Column
-            const dataCell = document.createElement('td');
-            const pre = document.createElement('pre');
-            pre.textContent = event.data;
-            dataCell.appendChild(pre);
-            row.appendChild(dataCell);
-
-            // Response Column
-            const responseCell = document.createElement('td');
-            responseCell.textContent = event.response; // Add response field
-            row.appendChild(responseCell);
-
-            // Insert the new row at the top of the table
-            tableBody.prepend(row);
-        });
-    };
-
-    socket.onclose = () => {
-        console.log('WebSocket connection closed');
-    };
-
-    socket.onerror = (error) => {
-        console.error('WebSocket error:', error);
-    };
+<script type="module">
+    import setupWebSocket from '../js/websocket.js';
+    setupWebSocket('eventTable');
 </script>
-
 
