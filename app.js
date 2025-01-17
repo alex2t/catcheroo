@@ -28,6 +28,7 @@ const wss = setupWebSocket(server);
 
 //  Broadcast events function
 app.locals.broadcastEvent = (event) => {
+    console.log('Broadcasting event:', event); 
     wss.broadcast([event]);
 };
 

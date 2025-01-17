@@ -11,7 +11,11 @@
     <tbody id="eventTable">
         <% events.forEach(event => { %>
             <tr>
-                <td class="activity-column"><%= event.activity %></td>
+                <td class="activity-column">
+                    <%= event.activity %>
+                    <br>
+                    <small><%= event.timestamp %></small>
+                </td>
                 <td class="data-column">
                     <pre><%= event.data %></pre>
                 </td>
