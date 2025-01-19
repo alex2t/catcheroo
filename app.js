@@ -26,11 +26,10 @@ app.use('/', routes);
 // Set up WebSocket server
 const wss = setupWebSocket(server);
 
-//  Broadcast events function
-app.locals.broadcastEvent = (event) => {
-    console.log('Broadcasting event:', event); 
+app.locals.broadcastEvent = (event) => { 
     wss.broadcast([event]);
 };
+
 
 // Start server
 const PORT = 3001;

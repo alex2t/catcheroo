@@ -1,3 +1,4 @@
+
 <h1 class="text-center mb-4">Event Listener</h1>
 
 <table class="table table-bordered table-striped">
@@ -10,11 +11,13 @@
     </thead>
     <tbody id="eventTable">
         <% events.forEach(event => { %>
-            <tr>
+            <tr data-event-id="<%= event.id %>">
                 <td class="activity-column">
                     <%= event.activity %>
                     <br>
                     <small><%= event.timestamp %></small>
+                    <br>
+                    <button class="btn btn-danger delete-button mt-2">Delete</button>
                 </td>
                 <td class="data-column">
                     <pre><%= event.data %></pre>
@@ -25,8 +28,10 @@
     </tbody>
 </table>
 
+
 <script type="module">
     import setupWebSocket from '../js/websocket.js';
+    import '../js/deleteEvent.js';
     setupWebSocket('eventTable');
 </script>
 
