@@ -31,8 +31,9 @@ app.locals.broadcastEvent = (event) => {
 };
 
 
-// Start server
-const PORT = 3001;
-server.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+const PORT = process.env.PORT || 3001;
+const HOST = process.env.HOST || 'localhost'; // Use 'localhost' for local development, and '0.0.0.0' for production
+
+server.listen(PORT, HOST, () => {
+    console.log(`Server is running on http://${HOST}:${PORT}`);
 });
