@@ -2,8 +2,10 @@ const express = require('express');
 const http = require('http');
 const bodyParser = require('body-parser');
 const setupWebSocket = require('./utils/websocket');
-const routes = require('./routes/routes');
+const authRoutes = require('./routes/auth');
+const eventListenerRoutes = require('./routes/eventlistener')
 const expressLayouts = require('express-ejs-layouts');
+
 
 const app = express();
 const server = http.createServer(app);
@@ -16,8 +18,12 @@ app.set('layout', 'layout');
 
 // Middleware and routes
 app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true })); 
+app.use(express.json()); 
 app.use(express.static('public'));
-app.use('/', routes);
+
+app.use('/', authRoutes);
+app.use('/', eventListenerRoutes);
 
 // Set up WebSocket server
 const wss = setupWebSocket(server);

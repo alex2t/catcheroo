@@ -62,7 +62,7 @@ router.get('/listener', async (req, res) => {
         if (req.headers.accept && req.headers.accept.includes('application/json')) {
             res.json(events); 
         } else {
-            res.render('listener', { events }); 
+            res.render('listener/listener', { events }); 
         }
     } catch (err) {
         console.error('Error fetching events from Redis:', err);
