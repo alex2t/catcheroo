@@ -5,6 +5,7 @@ const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const db = require('../db');
+const { generateUID, isValidPassword, isValidEmail } = require('../utils/auth');
 
 
 
@@ -27,9 +28,20 @@ router.get('/register', (req, res) => {
 });
 
 
+
+
 router.post('/register', (req, res) => {
     const { email } = req.body;
 
+    // Validate email format
+    if (!isValidEmail(email)) {
+        return res.render('registration/register', { error: "Invalid email format. Please enter a valid email.", success: null });
+    }
+
+    // Check if the email belongs to the allowed domain
+    if (!email.endsWith(`@${EMAIL_DOMAIN}`)) {
+        return res.render('registration/register', { error: null, success: "A verification email has been sent. Please check your inbox." });
+    }
 
     // Check if email is already registered
     db.get(`SELECT * FROM ${DB_TABLE_Auth} WHERE email = ?`, [email], async (err, existingAccount) => {
@@ -39,10 +51,6 @@ router.post('/register', (req, res) => {
 
         if (existingAccount) {
             return res.render('registration/register', { error: "User already registered. Please login instead.", success: null });
-        }
-
-        if (!email.endsWith(`@${EMAIL_DOMAIN}`)) {
-            return res.render('registration/register', { error: null, success: "A verification email has been sent. Please check your inbox." });
         }
 
         // Generate a verification token
@@ -72,6 +80,7 @@ router.post('/register', (req, res) => {
 
 
 
+
 router.get('/set-password/:token', (req, res) => {
     const { token } = req.params;
 
@@ -96,7 +105,11 @@ router.post('/set-password', async (req, res) => {
     const { email, password, confirmPassword } = req.body;
 
     if (!email) {
-        return res.render('registration/set-password', { email: null, error: "Invalid or expired token. Please register again.", success: null });
+        return res.render('registration/set-password', { email: null, error: "Invalid or expired token. Please register again." });
+    }
+
+    if (!isValidPassword(password)) {
+        return res.render('registration/set-password', { email, error: "Password must be at least 8 characters, include an uppercase letter, a lowercase letter, and a number.", success: null });
     }
 
     if (password !== confirmPassword) {
@@ -104,16 +117,26 @@ router.post('/set-password', async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+    const registrationDate = new Date().toISOString();
+    const passwordResetDate = new Date();
+    passwordResetDate.setDate(passwordResetDate.getDate() + 90);
 
-    db.run(`INSERT INTO ${DB_TABLE_Auth} (email, password) VALUES (?, ?)`, [email, hashedPassword], (err) => {
-        if (err) {
-            return res.render('registration/set-password', { email, error: "Error saving user. Try again.", success: null });
+    const uid = generateUID();
+
+    db.run(
+        `INSERT INTO ${DB_TABLE_Auth} (uid, email, password, registration_date, password_reset_date) VALUES (?, ?, ?, ?, ?)`,
+        [uid, email, hashedPassword, registrationDate, passwordResetDate.toISOString()],
+        (err) => {
+            if (err) {
+                console.log(err)
+                return res.render('registration/set-password', { email, error: "Error saving user. Try again.", success: null });
+            }
+            res.render('registration/set-password', { email, error: null, success: "✅ Registration successful! You can now log in." });
         }
-
-        // Always pass both 'error' and 'success' variables to avoid reference errors
-        res.render('registration/set-password', { email, error: null, success: "✅ You have successfully registered. Please sign in below." });
-    });
+    );
 });
+
+
 
 router.get('/login', (req, res) => {
     res.render('registration/login', { error: null });
@@ -187,12 +210,22 @@ router.get('/reset-password/:token', (req, res) => {
     }
 });
 
+
 router.post('/reset-password', async (req, res) => {
     const { token, password, confirmPassword } = req.body;
 
     try {
         const decoded = jwt.verify(token, SECRET_KEY);
         const email = decoded.email;
+
+        // Validate password strength
+        if (!isValidPassword(password)) {
+            return res.render('registration/reset-password', { 
+                token, 
+                error: "Password must be at least 8 characters, include an uppercase letter, a lowercase letter, and a number.", 
+                success: null 
+            });
+        }
 
         if (password !== confirmPassword) {
             return res.render('registration/reset-password', { token, error: "Passwords do not match!", success: null });
@@ -207,7 +240,6 @@ router.post('/reset-password', async (req, res) => {
         res.render('registration/reset-password', { token: null, error: "Invalid or expired token.", success: null });
     }
 });
-
 
 
 
