@@ -1,11 +1,14 @@
 const express = require('express');
 const http = require('http');
 const bodyParser = require('body-parser');
+const session = require('express-session');
+const passport = require('passport');
+const SQLiteStore = require('connect-sqlite3')(session);
 const setupWebSocket = require('./utils/websocket');
-const authRoutes = require('./routes/auth');
-const eventListenerRoutes = require('./routes/eventlistener')
-const expressLayouts = require('express-ejs-layouts');
+const authRoutes = require('./routes/registration');
+const eventListenerRoutes = require('./routes/eventlistener');
 
+const expressLayouts = require('express-ejs-layouts');
 
 const app = express();
 const server = http.createServer(app);
@@ -16,11 +19,26 @@ app.set('views', __dirname + '/views');
 app.use(expressLayouts);
 app.set('layout', 'layout');
 
-// Middleware and routes
+// Middleware
 app.use(bodyParser.json());
-app.use(express.urlencoded({ extended: true })); 
-app.use(express.json()); 
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(express.static('public'));
+
+app.use(
+    session({
+        secret: process.env.SECRET_KEY || 'securekey',
+        resave: false,
+        saveUninitialized: false,
+        store: new SQLiteStore({ db: 'sessions.sqlite', dir: './data' }),
+        cookie: { maxAge: 24 * 60 * 60 * 1000 }, // 1 day
+    })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Routes
 
 app.use('/', authRoutes);
 app.use('/', eventListenerRoutes);
@@ -31,7 +49,6 @@ const wss = setupWebSocket(server);
 wss.on('connection', (ws) => {
     console.log('New client connected');
 
-    // Ping every 30 seconds
     const interval = setInterval(() => {
         if (ws.readyState === ws.OPEN) {
             ws.ping();

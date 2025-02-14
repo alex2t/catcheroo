@@ -11,8 +11,17 @@ const REDIS_KEY = 'events';
 // EVENT_TTL in seconds
 const EVENT_TTL = 300; 
 
+// Middleware to protect routes (except for webhook)
+const requireAuth = (req, res, next) => {
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect('/login');
+};
+
+
 // POST: Store the event
-router.post('/listener', async (req, res) => {
+router.post('/listener',  requireAuth, async (req, res) => {
     try {
         const activity = req.body.activity || 'Unknown';
         const data = { ...req.body };
@@ -41,7 +50,7 @@ router.post('/listener', async (req, res) => {
     }
 });
 
-router.get('/listener', async (req, res) => {
+router.get('/listener', requireAuth, async (req, res) => {
     try {
         const keys = await redisClient.keys('event:*');
         const events = [];
