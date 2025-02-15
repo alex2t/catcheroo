@@ -21,7 +21,7 @@ const requireAuth = (req, res, next) => {
 
 
 // POST: Store the event
-router.post('/listener',  requireAuth, async (req, res) => {
+router.post('/listener', async (req, res) => {
     try {
         const activity = req.body.activity || 'Unknown';
         const data = { ...req.body };
@@ -50,7 +50,7 @@ router.post('/listener',  requireAuth, async (req, res) => {
     }
 });
 
-router.get('/listener', requireAuth, async (req, res) => {
+router.get('/listener', async (req, res) => {
     try {
         const keys = await redisClient.keys('event:*');
         const events = [];

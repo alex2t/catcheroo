@@ -3,7 +3,6 @@ const http = require('http');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const passport = require('passport');
-const SQLiteStore = require('connect-sqlite3')(session);
 const setupWebSocket = require('./utils/websocket');
 const authRoutes = require('./routes/registration');
 const eventListenerRoutes = require('./routes/eventlistener');
@@ -25,18 +24,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static('public'));
 
-app.use(
-    session({
-        secret: process.env.SECRET_KEY || 'securekey',
-        resave: false,
-        saveUninitialized: false,
-        store: new SQLiteStore({ db: 'sessions.sqlite', dir: './data' }),
-        cookie: { maxAge: 24 * 60 * 60 * 1000 }, // 1 day
-    })
-);
+
 
 app.use(passport.initialize());
-app.use(passport.session());
+
 
 // Routes
 
