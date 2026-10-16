@@ -7,7 +7,7 @@ const db = require('../../db');
 const { isValidPassword } = require('../../utils/auth');
 const {generateUID} = require('../../utils/auth');
 
-const SECRET_KEY = process.env.SECRET_KEY || "securekey";
+const SECRET_KEY = process.env.SECRET_KEY;
 const DB_TABLE_Auth = process.env.DB_TABLE_Auth ;
 
 

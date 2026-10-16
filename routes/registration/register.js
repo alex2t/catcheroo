@@ -5,7 +5,7 @@ const db = require('../../db');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const { isValidEmail } = require('../../utils/auth');
-const SECRET_KEY = process.env.SECRET_KEY || "securekey";
+const SECRET_KEY = process.env.SECRET_KEY;
 const EMAIL_DOMAIN = process.env.EMAIL_DOMAIN;
 
 const DB_TABLE_Auth = process.env.DB_TABLE_Auth;

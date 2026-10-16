@@ -6,7 +6,7 @@ const bcrypt = require('bcrypt');
 const db = require('../../db');
 
 
-const SECRET_KEY = process.env.SECRET_KEY || "securekey";
+const SECRET_KEY = process.env.SECRET_KEY;
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
